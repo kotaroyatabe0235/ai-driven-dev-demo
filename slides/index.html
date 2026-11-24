@@ -126,7 +126,7 @@
     <div class="msg a"><div class="who">AI</div><div class="b">名前と見た目は？　音は入れる？ A なし／B 効果音／C 効果音と BGM</div></div>
     <div class="msg h"><div class="who">人</div><div class="b"><q>和風で</q>　<q>A、軽くいこうぜ</q><span class="note">（音なし）</span></div></div>
     <div class="msg a"><div class="who">AI</div><div class="b">動くことの確かめ方は？ マージは誰が決める？ PR の分け方は？ 最高点は残す？</div></div>
-    <div class="msg h"><div class="who">人</div><div class="b"><q>B</q><span class="note">（自動テスト＋CI）</span>　<q>A</q><span class="note">（AI がマージ）</span>　<q>C</q><span class="note">（AI が決める）</span>　<q>A</q><span class="note">（残さない）</span></div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>B</q><span class="note">（自動テストを、PR のたびに GitHub で自動で走らせる。これを CI という）</span>　<q>A</q><span class="note">（AI がマージ）</span>　<q>C</q><span class="note">（AI が決める）</span>　<q>A</q><span class="note">（残さない）</span></div></div>
     <div class="msg h"><div class="who">人</div><div class="b"><q>specつくって、そのあとも資料作りまで進めていいよ</q></div></div>
     <div class="msg h"><div class="who">人</div><div class="b"><q>レビュー指摘とか修正とか、コミット履歴に残しておいて</q></div></div>
   </div>
@@ -145,15 +145,15 @@
     <rect x="220" y="130" width="190" height="100" fill="#fbf7ee" stroke="#b08d3c" stroke-width="3"/>
     <text x="315" y="165" text-anchor="middle" font-size="20" fill="#26231f">進行役 AI</text>
     <text x="315" y="190" text-anchor="middle" font-size="14" fill="#5a5247">spec を書く・取り次ぐ</text>
-    <text x="315" y="210" text-anchor="middle" font-size="14" fill="#5a5247">マージする（Opus）</text>
+    <text x="315" y="210" text-anchor="middle" font-size="14" fill="#5a5247">マージする（モデル Opus）</text>
     <rect x="480" y="30" width="210" height="100" fill="#fbf7ee" stroke="#2f4f7f" stroke-width="3"/>
     <text x="585" y="65" text-anchor="middle" font-size="20" fill="#26231f">作り手 AI</text>
     <text x="585" y="90" text-anchor="middle" font-size="14" fill="#5a5247">分け方を決め、書き、直す</text>
-    <text x="585" y="110" text-anchor="middle" font-size="14" fill="#5a5247">（Sonnet・1人）</text>
+    <text x="585" y="110" text-anchor="middle" font-size="14" fill="#5a5247">（モデル Sonnet・1人）</text>
     <rect x="480" y="230" width="210" height="100" fill="#fbf7ee" stroke="#2f4f7f" stroke-width="3"/>
     <text x="585" y="265" text-anchor="middle" font-size="20" fill="#26231f">レビュー役 AI</text>
     <text x="585" y="290" text-anchor="middle" font-size="14" fill="#5a5247">PR にコメントする</text>
-    <text x="585" y="310" text-anchor="middle" font-size="14" fill="#5a5247">（Sonnet・毎回まっさら）</text>
+    <text x="585" y="310" text-anchor="middle" font-size="14" fill="#5a5247">（モデル Sonnet・毎回まっさら）</text>
     <rect x="770" y="140" width="210" height="80" fill="#fbf7ee" stroke="#6f8f3a" stroke-width="3"/>
     <text x="875" y="172" text-anchor="middle" font-size="18" fill="#26231f">テストも通れば</text>
     <text x="875" y="198" text-anchor="middle" font-size="18" fill="#26231f">進行役がマージ</text>
@@ -167,7 +167,7 @@
     <line x1="690" y1="280" x2="800" y2="224" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
     <text x="720" y="275" font-size="14" fill="#5a5247">指摘0件</text>
   </svg>
-  <p class="small">図はゲームを作った PR #2〜#4 の流れ。最初の PR #1（spec）は、進行役が書いて直し、テストの自動実行はまだ無かった。レビュー役は回ごとに新しく呼ぶ。作り手の事情を知らない目で見るため。前の回に見た範囲は「レビュー台帳」で渡し、同じところを二度見させない。</p>
+  <p class="small">図はゲームを作った PR #2〜#4 の流れ。最初の PR #1（spec）は、進行役が書いて直し、テストの自動実行はまだ無かった。レビュー役は回ごとに新しく呼ぶ。作り手の事情を知らない目で見るため。前の回に見た範囲は「レビュー台帳」（どこを見て何が出たかの記録）で渡し、同じところを二度見させない。Opus・Sonnet は、使った AI のモデル（種類）の名前。</p>
   <span class="no">5</span>
 </section>
 
