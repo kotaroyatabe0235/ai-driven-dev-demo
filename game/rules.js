@@ -143,17 +143,21 @@
     return true;
   }
 
-  // dir: 1 で時計回り、-1 で反時計回り。壁や積み上がりに当たるときは横に少しずらして試す。
+  // dir: 1 で時計回り、-1 で反時計回り。壁や積み上がりに当たるときは、
+  // 横に最大 2 マス、上に最大 2 マスずらして試す（先に上へ動かさず、横だけで済むならそれを選ぶ）。
   function rotate(state, dir) {
     if (state.gameOver) return false;
     var p = state.piece;
     var cells = rotateMatrix(p.cells, dir);
-    var kicks = [0, -1, 1, -2, 2], i;
-    for (i = 0; i < kicks.length; i++) {
-      if (!collides(state.board, cells, p.x + kicks[i], p.y)) {
-        p.cells = cells;
-        p.x += kicks[i];
-        return true;
+    var dxs = [0, -1, 1, -2, 2], dys = [0, -1, -2], i, j;
+    for (j = 0; j < dys.length; j++) {
+      for (i = 0; i < dxs.length; i++) {
+        if (!collides(state.board, cells, p.x + dxs[i], p.y + dys[j])) {
+          p.cells = cells;
+          p.x += dxs[i];
+          p.y += dys[j];
+          return true;
+        }
       }
     }
     return false;

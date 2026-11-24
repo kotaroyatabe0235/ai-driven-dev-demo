@@ -123,7 +123,7 @@ test('回せる場所がなければ回らない', () => {
   const s = game();
   setPiece(s, 2, 3, 0);
   // 縦にした三が入る余地を、上下左右とも埋める
-  for (let c = 0; c < 10; c++) for (let r = 1; r < 6; r++) s.board[r][c] = 9;
+  for (let c = 0; c < 10; c++) for (let r = 0; r < 6; r++) s.board[r][c] = 9;
   const before = JSON.stringify(s.piece);
   assert.equal(G.rotate(s, 1), false);
   assert.equal(JSON.stringify(s.piece), before);
@@ -240,19 +240,30 @@ test('形の番号が重複しない', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('空の盤面なら、どの形をどの場所でも、どちら回りにも回せる', () => {
+test('空の盤面なら、どの形をどの場所（上下も）でも、どちら回りにも回せる', () => {
   for (const shape of G.SHAPES) {
     let cells = shape.cells.map((r) => r.slice());
     for (let turn = 0; turn < 4; turn++) {
       for (const dir of [1, -1]) {
         for (let x = 0; x + cells[0].length <= 10; x++) {
-          const s = game();
-          s.piece = { id: shape.id, cells: cells.map((r) => r.slice()), x, y: 5 };
-          assert.equal(G.rotate(s, dir), true, `${shape.name} x=${x} 向き=${turn} dir=${dir}`);
-          assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
+          for (let y = 0; y + cells.length <= 20; y++) {
+            const s = game();
+            s.piece = { id: shape.id, cells: cells.map((r) => r.slice()), x, y };
+            assert.equal(G.rotate(s, dir), true, `${shape.name} x=${x} y=${y} 向き=${turn} dir=${dir}`);
+            assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
+          }
         }
       }
       cells = G.rotateMatrix(cells, 1);
     }
   }
+});
+
+test('底に着いた横の三も、縦に回せる（上にずれる）', () => {
+  const s = game();
+  setPiece(s, 2, 4, 19);
+  assert.equal(G.rotate(s, 1), true);
+  assert.equal(s.piece.cells.length, 3);
+  assert.equal(s.piece.y, 17);
+  assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
 });
