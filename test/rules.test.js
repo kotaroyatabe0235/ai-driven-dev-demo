@@ -242,3 +242,20 @@ test('形の番号が重複しない', () => {
   const ids = G.SHAPES.map((s) => s.id);
   assert.equal(new Set(ids).size, ids.length);
 });
+
+test('空の盤面なら、どの形をどの場所でも、どちら回りにも回せる', () => {
+  for (const shape of G.SHAPES) {
+    let cells = shape.cells.map((r) => r.slice());
+    for (let turn = 0; turn < 4; turn++) {
+      for (const dir of [1, -1]) {
+        for (let x = 0; x + cells[0].length <= 10; x++) {
+          const s = game();
+          s.piece = { id: shape.id, cells: cells.map((r) => r.slice()), x, y: 5 };
+          assert.equal(G.rotate(s, dir), true, `${shape.name} x=${x} 向き=${turn} dir=${dir}`);
+          assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
+        }
+      }
+      cells = G.rotateMatrix(cells, 1);
+    }
+  }
+});
