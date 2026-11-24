@@ -164,7 +164,7 @@
       return row.some(function (v) { return !v; });
     });
     var cleared = state.rows - kept.length;
-    while (kept.length < state.rows) kept.unshift(new Array(state.cols).fill(0));
+    while (kept.length < state.rows) kept.unshift(createBoard(state.cols, 1)[0]);
     state.board = kept;
     return cleared;
   }
