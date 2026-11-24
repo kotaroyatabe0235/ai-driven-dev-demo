@@ -47,19 +47,16 @@ test('7 種のすべてが出る', () => {
   assert.deepEqual([...seen].sort(), [1, 2, 3, 4, 5, 6, 7]);
 });
 
-test('同じ形が 3 回続くことはない', () => {
-  const next = G.createPicker(() => 0); // 乱数が同じ値ばかりでも、選び直しは 1 回
-  const ids = [next().id, next().id, next().id, next().id];
-  assert.deepEqual(ids, [1, 1, 1, 1]);
-  const next2 = G.createPicker(seeded(11));
-  let run = 1, maxRun = 1, prev = next2().id;
-  for (let i = 0; i < 500; i++) {
-    const id = next2().id;
-    run = id === prev ? run + 1 : 1;
-    maxRun = Math.max(maxRun, run);
-    prev = id;
-  }
-  assert.ok(maxRun <= 2);
+test('直前と同じ形が出たときは、1 回だけ選び直す', () => {
+  // 乱数が常に同じ値なら、選び直しても同じ形になるので、同じ形が続く
+  const same = G.createPicker(() => 0);
+  assert.deepEqual([same().id, same().id, same().id], [1, 1, 1]);
+  // 1 回目と同じ形が出たあと、選び直しで別の形になる
+  const values = [0, 0, 0.5];
+  let i = 0;
+  const next = G.createPicker(() => values[i++]);
+  assert.equal(next().id, 1);
+  assert.equal(next().id, 4); // 0 → 同じなので選び直し → 0.5 → 4 番目
 });
 
 test('同じ乱数なら同じ順に出る', () => {
