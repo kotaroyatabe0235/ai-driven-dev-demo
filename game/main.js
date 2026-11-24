@@ -105,10 +105,10 @@
       var interval = G.dropInterval(state.level);
       // 1 回の加算は、落下 1 回ぶんの間隔までに切る。タブが裏に回ったあとでも、1 フレームで落ちるのは 1 マスだけ。
       acc += Math.min(dt, interval);
-      while (acc >= interval && !state.gameOver) {
+      // 1 フレームに tick は 1 回まで。tick でレベルが上がって間隔が縮んでも、続けては落ちない。
+      if (acc >= interval) {
         acc -= interval;
         G.tick(state);
-        interval = G.dropInterval(state.level);
       }
     }
     render();
