@@ -3,6 +3,7 @@
   'use strict';
 
   var G = window.IroGami;
+  var K = window.IroGamiKeys;
   var CELL = 30;
 
   // 伝統色。形の番号（1〜7）に対応する。
@@ -116,21 +117,20 @@
   }
 
   document.addEventListener('keydown', function (e) {
-    var handled = true;
-    switch (e.key) {
-      case 'ArrowLeft': G.move(state, -1); break;
-      case 'ArrowRight': G.move(state, 1); break;
-      case 'ArrowUp': G.rotate(state, 1); break;
-      case 'z': case 'Z': G.rotate(state, -1); break;
-      case 'ArrowDown': if (G.softDrop(state)) acc = 0; break;
-      case ' ': case 'Spacebar': if (!e.repeat) { G.hardDrop(state); acc = 0; } break;
-      case 'Enter': restart(); break;
-      default: handled = false;
+    var action = K.actionFor(e.key, e.repeat);
+    // 割り当てのあるキーは、ページがスクロールしないよう既定の動作を止める。
+    if (e.key === ' ' || e.key === 'Spacebar' || action) e.preventDefault();
+    if (!action) return;
+    switch (action) {
+      case 'left': G.move(state, -1); break;
+      case 'right': G.move(state, 1); break;
+      case 'rotateRight': G.rotate(state, 1); break;
+      case 'rotateLeft': G.rotate(state, -1); break;
+      case 'softDrop': if (G.softDrop(state)) acc = 0; break;
+      case 'hardDrop': G.hardDrop(state); acc = 0; break;
+      case 'restart': restart(); return;
     }
-    if (handled) {
-      e.preventDefault();
-      render();
-    }
+    render();
   });
 
   restart();
