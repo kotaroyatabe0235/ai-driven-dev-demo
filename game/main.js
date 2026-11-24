@@ -102,8 +102,9 @@
     var dt = now - last;
     last = now;
     if (!state.gameOver) {
-      acc += Math.min(dt, 1000); // タブが裏に回ったあとに、まとめて落ちないようにする
       var interval = G.dropInterval(state.level);
+      // 1 回の加算は、落下 1 回ぶんの間隔までに切る。タブが裏に回ったあとでも、1 フレームで落ちるのは 1 マスだけ。
+      acc += Math.min(dt, interval);
       while (acc >= interval && !state.gameOver) {
         acc -= interval;
         G.tick(state);
