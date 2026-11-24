@@ -16,6 +16,9 @@ test('キーと操作の割り当て', () => {
 
 test('押しっぱなしでも、左右・回転・下は繰り返す', () => {
   assert.equal(K.actionFor('ArrowLeft', true), 'left');
+  assert.equal(K.actionFor('ArrowRight', true), 'right');
+  assert.equal(K.actionFor('ArrowUp', true), 'rotateRight');
+  assert.equal(K.actionFor('z', true), 'rotateLeft');
   assert.equal(K.actionFor('ArrowDown', true), 'softDrop');
 });
 
