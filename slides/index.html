@@ -66,6 +66,9 @@
   /* 図 */
   svg.flow { width: 100%; max-width: 1000px; height: auto; }
   svg.flow text { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; }
+  ol.flow-list { display: none; margin: 0 0 16px; padding-left: 1.4em; font-size: 16px; }
+  ol.flow-list li { margin-bottom: 6px; }
+  @media (max-width: 700px) { svg.flow { display: none; } ol.flow-list { display: block; } }
 
   .shot { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
   .shot img { width: min(100%, 520px); height: auto; border: 1px solid var(--line); }
@@ -167,6 +170,13 @@
     <line x1="690" y1="280" x2="800" y2="224" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
     <text x="720" y="275" font-size="14" fill="#5a5247">指摘0件</text>
   </svg>
+  <ol class="flow-list">
+    <li><b>人</b>：仕様の問いに答える</li>
+    <li><b>進行役 AI</b>（モデル Opus）：spec を書き、作り手とレビュー役に取り次ぐ</li>
+    <li><b>作り手 AI</b>（モデル Sonnet・1人）：PR の分け方を決め、書いて PR を出し、指摘を直す</li>
+    <li><b>レビュー役 AI</b>（モデル Sonnet・毎回まっさら）：PR にコメントする</li>
+    <li>指摘0件で、テストも通れば、<b>進行役</b>がマージ</li>
+  </ol>
   <p class="small">図はゲームを作った PR #2〜#4 の流れ。最初の PR #1（spec）は、進行役が書いて直し、テストの自動実行はまだ無かった。レビュー役は回ごとに新しく呼ぶ。作り手の事情を知らない目で見るため。前の回に見た範囲は「レビュー台帳」（どこを見て何が出たかの記録）で渡し、同じところを二度見させない。Opus・Sonnet は、使った AI のモデル（種類）の名前。</p>
   <span class="no">5</span>
 </section>
