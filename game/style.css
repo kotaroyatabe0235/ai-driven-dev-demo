@@ -1,0 +1,80 @@
+:root {
+  --washi: #f1e9d6;
+  --washi-deep: #e4d8bb;
+  --sumi: #26231f;
+  --sumi-soft: #4a443b;
+  --shu: #c8402f;
+  --kin: #b08d3c;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh;
+  background-color: var(--washi);
+  background-image:
+    repeating-radial-gradient(circle at 0 0, transparent 0, transparent 18px, rgba(38,35,31,.05) 19px, transparent 20px),
+    repeating-radial-gradient(circle at 20px 20px, transparent 0, transparent 18px, rgba(38,35,31,.05) 19px, transparent 20px);
+  background-size: 40px 40px;
+  color: var(--sumi);
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.stage { padding: 20px 16px; }
+.title {
+  margin: 0 0 14px;
+  font-size: 28px;
+  letter-spacing: .3em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.seal {
+  display: inline-flex;
+  width: 34px; height: 34px;
+  align-items: center; justify-content: center;
+  background: var(--shu);
+  color: var(--washi);
+  font-size: 20px;
+  letter-spacing: 0;
+  border-radius: 3px;
+  transform: rotate(-4deg);
+}
+.layout { display: flex; gap: 20px; justify-content: center; align-items: flex-start; }
+.board-wrap {
+  position: relative;
+  padding: 8px;
+  background: var(--sumi);
+  border: 3px double var(--kin);
+  box-shadow: 0 6px 18px rgba(38,35,31,.35);
+}
+#board { display: block; background: #1d1b18; }
+.over {
+  position: absolute; inset: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(241,233,214,.9);
+  text-align: center;
+}
+.over[hidden] { display: none; }
+.over-title { margin: 0 0 14px; font-size: 36px; letter-spacing: .4em; color: var(--shu); font-weight: 700; padding-left: .4em; }
+.over-score { margin: 0 0 14px; font-size: 20px; }
+.over-hint { margin: 0; font-size: 15px; color: var(--sumi-soft); }
+.panel { width: 190px; display: flex; flex-direction: column; gap: 12px; }
+.card {
+  background: rgba(255,252,242,.8);
+  border: 1px solid var(--sumi-soft);
+  border-left: 5px solid var(--shu);
+  padding: 8px 12px;
+}
+.card h2 { margin: 0 0 4px; font-size: 13px; letter-spacing: .2em; color: var(--sumi-soft); font-weight: 400; }
+.card canvas { display: block; margin: 0 auto; }
+.num { margin: 0; font-size: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+.two { display: flex; justify-content: space-between; gap: 10px; }
+.two > div { flex: 1; }
+.two .num { font-size: 22px; }
+.keys dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 13px; }
+.keys dt { font-weight: 700; }
+.keys dd { margin: 0; }

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>色紙落とし</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="stage">
+  <h1 class="title"><span class="seal" aria-hidden="true">落</span>色紙落とし</h1>
+  <div class="layout">
+    <div class="board-wrap">
+      <canvas id="board" width="300" height="600" aria-label="盤面"></canvas>
+      <div id="over" class="over" hidden>
+        <p class="over-title">終 局</p>
+        <p class="over-score">点数 <span id="over-score">0</span></p>
+        <p class="over-hint">Enter でもう一度</p>
+      </div>
+    </div>
+    <aside class="panel">
+      <section class="card">
+        <h2>次</h2>
+        <canvas id="next" width="120" height="120" aria-label="次のブロック"></canvas>
+      </section>
+      <section class="card">
+        <h2>点数</h2>
+        <p class="num" id="score">0</p>
+      </section>
+      <section class="card two">
+        <div><h2>段</h2><p class="num" id="level">1</p></div>
+        <div><h2>消した列</h2><p class="num" id="lines">0</p></div>
+      </section>
+      <section class="card keys">
+        <h2>操作</h2>
+        <dl>
+          <dt>← →</dt><dd>動かす</dd>
+          <dt>↑</dt><dd>右に回す</dd>
+          <dt>Z</dt><dd>左に回す</dd>
+          <dt>↓</dt><dd>1 マス落とす</dd>
+          <dt>Space</dt><dd>一気に落とす</dd>
+          <dt>Enter</dt><dd>やり直し</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+<script src="rules.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
