@@ -30,6 +30,7 @@ https://kotaroyatabe0235.github.io/ai-driven-dev-demo/game/
 | `spec.md` | 仕様。人が決めたことと、AI が決めたことを分けて書いています |
 | `game/` | ゲーム本体。規則（`rules.js`）、キー割り当て（`keys.js`）、画面（`index.html`・`style.css`・`main.js`） |
 | `test/` | 自動テスト |
+| `slides/` | 紹介用のスライド（https://kotaroyatabe0235.github.io/ai-driven-dev-demo/slides/） |
 | `.github/workflows/` | PR ごとにテストを走らせる設定 |
 
 ## テスト
