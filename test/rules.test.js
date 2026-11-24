@@ -91,9 +91,24 @@ test('4 回回すと元に戻る', () => {
 
 test('壁ぎわで回すと横にずれて回れる', () => {
   const s = game();
-  setPiece(s, 3, 6, 5); // 横に 4 マスの長い棒が右端
-  assert.equal(G.rotate(s, 1), true);
+  setPiece(s, 3, 8, 5); // 長い棒を縦にして、右の壁ぎわに置く
+  s.piece.cells = G.rotateMatrix(s.piece.cells, 1); // 縦の 4 × 1
   assert.equal(s.piece.cells.length, 4);
+  assert.equal(G.rotate(s, 1), true);
+  assert.equal(s.piece.cells.length, 1);
+  assert.equal(s.piece.x, 6);
+  assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
+});
+
+test('積み上がりに当たるときも、横にずれて回れる', () => {
+  const s = game();
+  setPiece(s, 3, 4, 5);
+  s.piece.cells = G.rotateMatrix(s.piece.cells, 1); // 縦の 4 × 1
+  s.board[5][7] = 9; // 横にすると x=7 に当たる
+  const cur = s.piece.cells.length;
+  assert.equal(cur, 4);
+  assert.equal(G.rotate(s, 1), true);
+  assert.equal(s.piece.x, 3);
   assert.ok(!G.collides(s.board, s.piece.cells, s.piece.x, s.piece.y));
 });
 
