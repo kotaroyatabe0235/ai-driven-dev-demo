@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人はチャットだけ</title>
+<meta name="description" content="AI 駆動開発（on the loop 型）で、落ちものパズルを作った記録のスライド">
+<style>
+  :root {
+    --washi: #f3ecdc; --paper: #fbf7ee; --sumi: #26231f; --sub: #5a5247;
+    --shu: #c8402f; --ai: #2f4f7f; --wakaba: #6f8f3a; --kin: #b08d3c; --line: #d8cdb5;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y mandatory; }
+  body {
+    margin: 0; background: var(--washi); color: var(--sumi);
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    line-height: 1.6;
+  }
+  .slide {
+    min-height: 100vh; scroll-snap-align: start;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 48px max(16px, 6vw); position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  .no { position: absolute; right: max(16px, 3vw); bottom: 16px; font-size: 14px; color: var(--sub); }
+  h1, h2 { font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; margin: 0 0 24px; letter-spacing: .06em; }
+  h1 { font-size: clamp(32px, 6vw, 64px); line-height: 1.3; }
+  h2 { font-size: clamp(24px, 3.6vw, 42px); }
+  h2 .seal { display: inline-block; background: var(--shu); color: var(--paper); font-size: .6em; padding: 2px 8px; margin-right: 12px; vertical-align: middle; }
+  p.lead { font-size: clamp(18px, 2.2vw, 26px); margin: 0 0 16px; }
+  .small { font-size: clamp(13px, 1.4vw, 16px); color: var(--sub); }
+  .grid { display: grid; gap: 16px; }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .card { background: var(--paper); border: 1px solid var(--line); border-left: 6px solid var(--line); padding: 20px; }
+  .card h3 { margin: 0 0 8px; font-size: clamp(18px, 2vw, 24px); }
+  .card p { margin: 0; font-size: clamp(15px, 1.6vw, 19px); }
+  .card.hito { border-left-color: var(--shu); }
+  .card.ai { border-left-color: var(--ai); }
+  .card.me { border-left-color: var(--kin); }
+  .arrow { text-align: center; font-size: 28px; color: var(--sub); }
+  .tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 3px; color: var(--paper); margin-right: 6px; vertical-align: 2px; }
+  .tag.hito { background: var(--shu); }
+  .tag.ai { background: var(--ai); }
+  .tag.ok { background: var(--wakaba); }
+
+  /* チャット */
+  .chat { display: flex; flex-direction: column; gap: 10px; max-width: 880px; }
+  .msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg .who { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--paper); font-size: 14px; font-weight: bold; }
+  .msg.h .who { background: var(--shu); }
+  .msg.a .who { background: var(--ai); }
+  .msg .b { background: var(--paper); border: 1px solid var(--line); padding: 8px 14px; border-radius: 10px; font-size: clamp(15px, 1.6vw, 19px); }
+  .msg.h .b { border-color: #e3b3a9; }
+  .msg .b q { quotes: "「" "」"; font-weight: bold; }
+  .msg .b .note { color: var(--sub); font-size: .85em; }
+
+  /* 数字 */
+  .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+  .num { background: var(--paper); border: 1px solid var(--line); padding: 18px; text-align: center; }
+  .num b { display: block; font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.1; color: var(--ai); white-space: nowrap; }
+  .num.zero b { color: var(--shu); }
+  .num span { font-size: clamp(14px, 1.5vw, 17px); }
+
+  /* 図 */
+  svg.flow { width: 100%; max-width: 1000px; height: auto; }
+  svg.flow text { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; }
+
+  .shot { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+  .shot img { width: min(100%, 520px); height: auto; border: 1px solid var(--line); }
+  .shot ul { font-size: clamp(16px, 1.7vw, 20px); padding-left: 1.2em; margin: 0; }
+  a { color: var(--shu); }
+  .btn { display: inline-block; background: var(--shu); color: var(--paper); text-decoration: none; padding: 10px 22px; border: 3px double var(--kin); font-size: 18px; margin: 6px 8px 6px 0; }
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; }
+  .vs .mid { align-self: center; font-size: 22px; color: var(--sub); }
+  @media (max-width: 700px) { .vs { grid-template-columns: 1fr; } .vs .mid { text-align: center; } }
+  .hint { position: fixed; left: 16px; bottom: 12px; font-size: 12px; color: var(--sub); background: var(--washi); padding: 2px 6px; }
+  @media print { .hint { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide" id="s1">
+  <p class="small">AI 駆動開発のイメージ共有</p>
+  <h1>人がしたのは、<br>チャットだけ。</h1>
+  <p class="lead">AI が書いて、AI がレビューして、AI がマージする。<br>落ちものパズルを1本作って、その全部を記録しました。</p>
+  <p class="small">※ AI に任せる範囲を、できるだけ広げた演出の流れです。ふだんの開発で、ここまで任せるべきという主張ではありません。</p>
+  <span class="no">1</span>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2">
+  <h2><span class="seal">段</span>AI の使い方には段がある</h2>
+  <div class="grid g3">
+    <div class="card me"><h3>① チャットで聞く</h3><p>聞いて、答えをコピーして、人が貼る。手を動かすのは人。</p></div>
+    <div class="card me"><h3>② エージェントに任せる（in the loop）</h3><p>AI がファイルを直す。人が1手ずつ見て「はい」を押す。</p></div>
+    <div class="card ai"><h3>③ on the loop</h3><p>人はループの外にいる。決まりと止めどころを決め、結果を見て舵を切る。</p></div>
+  </div>
+  <p class="lead" style="margin-top:24px">今日見せるのは ③ です。</p>
+  <p class="small">in the loop・on the loop の分け方は、この資料での使い方です。決まった定義があるわけではありません。</p>
+  <span class="no">2</span>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3">
+  <h2><span class="seal">対</span>「ノリで作らせる」とは違う</h2>
+  <div class="vs">
+    <div class="card me"><h3>バイブコーディング</h3><p>仕様を詰めずに「〇〇作って」と頼み、出てきたものを見ながら直していく。</p></div>
+    <div class="mid">と</div>
+    <div class="card hito"><h3>AI 駆動開発</h3><p>先に、人と AI が対話で仕様を詰める。<br>詰めた仕様（spec.md）を正として、作るのもレビューも AI に任せる。</p></div>
+  </div>
+  <p class="lead" style="margin-top:24px">人の仕事は「何を作るか」を決めること。<br>今回は AI が質問し、人が答える形で、3分で8問を決めました。</p>
+  <span class="no">3</span>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="s4">
+  <h2><span class="seal">人</span>人がしたこと（ゲームについて、全部）</h2>
+  <div class="chat">
+    <div class="msg a"><div class="who">AI</div><div class="b">何で遊ぶ前提に？ A キーボード／B タッチ／C 両方</div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>Aでいいや</q></div></div>
+    <div class="msg a"><div class="who">AI</div><div class="b">要素は？ 1 次のブロック 2 点数 3 速くなる 4 ゲームオーバー 5 影 6 取り置き</div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>1〜4でいい</q>　<q>和風で</q>　<q>A、軽くいこうぜ</q><span class="note">（音なし）</span></div></div>
+    <div class="msg a"><div class="who">AI</div><div class="b">動くことの確かめ方は？ マージは誰が決める？ PR の分け方は？ 最高点は残す？</div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>B</q><span class="note">（自動テスト＋CI）</span>　<q>A</q><span class="note">（AI がマージ）</span>　<q>C</q><span class="note">（AI が決める）</span>　<q>A</q><span class="note">（残さない）</span></div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>specつくって、そのあとも資料作りまで進めていいよ</q></div></div>
+    <div class="msg h"><div class="who">人</div><div class="b"><q>レビュー指摘とか修正とか、コミット履歴に残しておいて</q></div></div>
+  </div>
+  <p class="small" style="margin-top:16px">この前に、発表の形・置き場所・使う AI モデルを決める会話がありました（ゲームの中身には触れていない）。</p>
+  <span class="no">4</span>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5">
+  <h2><span class="seal">役</span>だれが何をしたか</h2>
+  <svg class="flow" viewBox="0 0 1000 360" role="img" aria-label="人から進行役の AI、作り手の AI とレビュー役の AI、テスト、マージへの流れ">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a5247"/></marker></defs>
+    <rect x="10" y="140" width="150" height="80" fill="#fbf7ee" stroke="#c8402f" stroke-width="3"/>
+    <text x="85" y="175" text-anchor="middle" font-size="22" fill="#26231f">人</text>
+    <text x="85" y="202" text-anchor="middle" font-size="14" fill="#5a5247">仕様を答える</text>
+    <rect x="220" y="130" width="190" height="100" fill="#fbf7ee" stroke="#b08d3c" stroke-width="3"/>
+    <text x="315" y="165" text-anchor="middle" font-size="20" fill="#26231f">進行役 AI</text>
+    <text x="315" y="190" text-anchor="middle" font-size="14" fill="#5a5247">spec を書く・取り次ぐ</text>
+    <text x="315" y="210" text-anchor="middle" font-size="14" fill="#5a5247">マージする（Opus）</text>
+    <rect x="480" y="30" width="210" height="100" fill="#fbf7ee" stroke="#2f4f7f" stroke-width="3"/>
+    <text x="585" y="65" text-anchor="middle" font-size="20" fill="#26231f">作り手 AI</text>
+    <text x="585" y="90" text-anchor="middle" font-size="14" fill="#5a5247">分け方を決め、書き、直す</text>
+    <text x="585" y="110" text-anchor="middle" font-size="14" fill="#5a5247">（Sonnet・1人）</text>
+    <rect x="480" y="230" width="210" height="100" fill="#fbf7ee" stroke="#2f4f7f" stroke-width="3"/>
+    <text x="585" y="265" text-anchor="middle" font-size="20" fill="#26231f">レビュー役 AI</text>
+    <text x="585" y="290" text-anchor="middle" font-size="14" fill="#5a5247">PR にコメントする</text>
+    <text x="585" y="310" text-anchor="middle" font-size="14" fill="#5a5247">（Sonnet・毎回まっさら）</text>
+    <rect x="770" y="140" width="210" height="80" fill="#fbf7ee" stroke="#6f8f3a" stroke-width="3"/>
+    <text x="875" y="172" text-anchor="middle" font-size="18" fill="#26231f">テスト（CI）が通り</text>
+    <text x="875" y="198" text-anchor="middle" font-size="18" fill="#26231f">指摘0件 → マージ</text>
+    <line x1="160" y1="180" x2="216" y2="180" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="410" y1="160" x2="476" y2="95" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="410" y1="200" x2="476" y2="265" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="570" y1="130" x2="570" y2="226" stroke="#2f4f7f" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="600" y1="230" x2="600" y2="134" stroke="#2f4f7f" stroke-width="2" marker-end="url(#ar)"/>
+    <text x="520" y="185" font-size="14" fill="#2f4f7f">PR</text>
+    <text x="610" y="185" font-size="14" fill="#2f4f7f">指摘</text>
+    <line x1="690" y1="180" x2="766" y2="180" stroke="#5a5247" stroke-width="2" marker-end="url(#ar)"/>
+  </svg>
+  <p class="small">レビュー役は回ごとに新しく呼ぶ。作り手の事情を知らない目で見るため。前の回に見た範囲は「レビュー台帳」で渡し、同じところを二度見させない。</p>
+  <span class="no">5</span>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s6">
+  <h2><span class="seal">話</span>AI どうしのやりとり（実例）</h2>
+  <div class="chat">
+    <div class="msg a"><div class="who">審</div><div class="b"><span class="tag ai">レビュー役</span>4マスの5種は、よく知られたゲームの7種のうちの5種と同じ形。7種を1回ずつ配る袋も、標準的な配り方と同じ。spec の「既存のゲームに似せない」とぶつかる。</div></div>
+    <div class="msg a"><div class="who">作</div><div class="b"><span class="tag ai">作り手</span>4マスの形を全部やめ、2〜5マスの7種（二・三・かぎ・十・凹・把・階）に替えた。袋もやめた。一度に消せるのが最大3列になったので、点数表も作り直した。</div></div>
+    <div class="msg a"><div class="who">審</div><div class="b"><span class="tag ai">次のレビュー役</span>spec に「空の盤面ならどこでも回せる」とあるが、底の段では回せない。実行して確かめた。</div></div>
+    <div class="msg a"><div class="who">作</div><div class="b"><span class="tag ai">作り手</span>回すときに上へずらす処理を足し、全部の形・向き・位置で回せることをテストにした。</div></div>
+  </div>
+  <p class="lead" style="margin-top:20px">人はこのやりとりを読んでいません。<br>そのまま PR のコメントとコミットの履歴に残っています。</p>
+  <span class="no">6</span>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7">
+  <h2><span class="seal">数</span>かかったもの</h2>
+  <div class="nums">
+    <div class="num"><b>約25分</b><span>最初の PR から<br>最後のマージまで</span></div>
+    <div class="num"><b>4本</b><span>PR</span></div>
+    <div class="num"><b>11回</b><span>AI のレビュー</span></div>
+    <div class="num"><b>14件</b><span>指摘。全部 AI が直した</span></div>
+    <div class="num"><b>29件</b><span>自動テスト</span></div>
+    <div class="num zero"><b>0行</b><span>人が書いた・読んだコード</span></div>
+  </div>
+  <p class="small" style="margin-top:16px">仕様を決める対話は、この25分の前に約3分。時刻は GitHub の PR の記録から。</p>
+  <span class="no">7</span>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8">
+  <h2><span class="seal">品</span>できたもの「色紙落とし」</h2>
+  <div class="shot">
+    <img src="img/game.png" alt="色紙落としの画面。墨色の盤面に色紙のようなブロックが積まれ、右に次の形・点数・操作が並ぶ" width="1000" height="800">
+    <ul>
+      <li>和風：名前・色・形は AI が決めた</li>
+      <li>HTML・CSS・素の JavaScript だけ</li>
+      <li>パソコンのキーボードで遊べる</li>
+    </ul>
+  </div>
+  <p style="margin-top:16px">
+    <a class="btn" href="../game/">遊んでみる</a>
+    <a class="btn" href="https://github.com/kotaroyatabe0235/ai-driven-dev-demo/pulls?q=is%3Apr">PR とレビューを見る</a>
+    <a class="btn" href="https://github.com/kotaroyatabe0235/ai-driven-dev-demo/commits/main">コミットの履歴</a>
+  </p>
+  <span class="no">8</span>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9">
+  <h2><span class="seal">要</span>それでも、人が握っているもの</h2>
+  <div class="grid g3">
+    <div class="card hito"><h3>何を作るか</h3><p>仕様の8問は人が答えた。ここが無いと、ただのバイブコーディング。</p></div>
+    <div class="card hito"><h3>決まり</h3><p>「指摘が0件になるまで回す」「公開してはいけない情報を検査で止める」などの決まりは、人が決めて、前もって用意させておいたもの。</p></div>
+    <div class="card hito"><h3>止めどころ</h3><p>マージを AI に任せたのは今回の判断。本番の仕事なら、ここを人に戻す選択もある。</p></div>
+  </div>
+  <p class="small" style="margin-top:20px">確かめていないこと：人の手でキーを押しての確認と、Chrome 以外のブラウザでの表示は、まだしていません。キーの動きは、Chrome で押したことにする仕組みと、自動テストで確かめました。</p>
+  <span class="no">9</span>
+</section>
+
+<div class="hint">↓ か → で次へ</div>
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    function current() {
+      var y = window.scrollY + window.innerHeight / 3, idx = 0;
+      slides.forEach(function (s, i) { if (s.offsetTop <= y) idx = i; });
+      return idx;
+    }
+    document.addEventListener('keydown', function (e) {
+      var d = 0;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') d = 1;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') d = -1;
+      if (!d) return;
+      e.preventDefault();
+      var n = Math.max(0, Math.min(slides.length - 1, current() + d));
+      slides[n].scrollIntoView({ behavior: 'smooth' });
+    });
+  })();
+</script>
+</body>
+</html>
