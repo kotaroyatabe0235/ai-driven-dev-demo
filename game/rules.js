@@ -12,17 +12,18 @@
   var COLS = 10;
   var ROWS = 20;
   var LINES_PER_LEVEL = 10;
-  var LINE_SCORES = [0, 100, 300, 500, 800];
+  var LINE_SCORES = [0, 100, 300, 600];
 
-  // ブロックの形。1 が埋まるマス。色の番号は盤面の値（1 以上）としても使う。
+  // ブロックの形。1 が埋まるマス。2〜5 マスの 7 種で、すべて幅・高さが 3 以下。
+  // 色の番号は盤面の値（1 以上）としても使う。
   var SHAPES = [
-    { id: 1, name: 'ちいさな棒', cells: [[1, 1, 1]] },
-    { id: 2, name: 'かぎ', cells: [[1, 0], [1, 1]] },
-    { id: 3, name: '長い棒', cells: [[1, 1, 1, 1]] },
-    { id: 4, name: '田', cells: [[1, 1], [1, 1]] },
-    { id: 5, name: '山', cells: [[0, 1, 0], [1, 1, 1]] },
-    { id: 6, name: 'L', cells: [[1, 0, 0], [1, 1, 1]] },
-    { id: 7, name: '波', cells: [[0, 1, 1], [1, 1, 0]] }
+    { id: 1, name: '二', cells: [[1, 1]] },
+    { id: 2, name: '三', cells: [[1, 1, 1]] },
+    { id: 3, name: 'かぎ', cells: [[1, 0], [1, 1]] },
+    { id: 4, name: '十', cells: [[0, 1, 0], [1, 1, 1], [0, 1, 0]] },
+    { id: 5, name: '凹', cells: [[1, 0, 1], [1, 1, 1]] },
+    { id: 6, name: '把', cells: [[1, 1], [1, 1], [1, 0]] },
+    { id: 7, name: '階', cells: [[1, 0, 0], [1, 1, 0], [0, 1, 1]] }
   ];
 
   function copyMatrix(m) {
@@ -55,19 +56,18 @@
     return b;
   }
 
-  // 7 種を 1 回ずつ混ぜて配る袋。rng は 0 以上 1 未満を返す関数。
-  function createBag(rng) {
-    var queue = [];
+  // 7 種から等しい確率で選ぶ。ただし、直前と同じ形は 1 回だけ選び直す。
+  // rng は 0 以上 1 未満を返す関数。
+  function createPicker(rng) {
+    var prev = null;
+    function pick() {
+      return SHAPES[Math.floor(rng() * SHAPES.length)];
+    }
     return function next() {
-      if (queue.length === 0) {
-        var bag = SHAPES.slice(), i, j, t;
-        for (i = bag.length - 1; i > 0; i--) {
-          j = Math.floor(rng() * (i + 1));
-          t = bag[i]; bag[i] = bag[j]; bag[j] = t;
-        }
-        queue = bag;
-      }
-      return queue.shift();
+      var s = pick();
+      if (prev && s.id === prev.id) s = pick();
+      prev = s;
+      return s;
     };
   }
 
@@ -118,7 +118,7 @@
   function createGame(options) {
     options = options || {};
     var cols = options.cols || COLS, rows = options.rows || ROWS;
-    var nextShape = createBag(options.rng || Math.random);
+    var nextShape = createPicker(options.rng || Math.random);
     var state = {
       cols: cols,
       rows: rows,
@@ -220,7 +220,7 @@
     LINES_PER_LEVEL: LINES_PER_LEVEL,
     SHAPES: SHAPES,
     createGame: createGame,
-    createBag: createBag,
+    createPicker: createPicker,
     rotateMatrix: rotateMatrix,
     collides: collides,
     move: move,
